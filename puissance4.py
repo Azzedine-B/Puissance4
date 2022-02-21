@@ -1,6 +1,5 @@
 
 # Creer la liste de toutes les combinaisons de 4 jetons sur l ensemble des lignes
-
 def verifVictoireLigne(tab) :
 	liste=[]
 	for i in range(6) :
@@ -144,19 +143,15 @@ def verifCaseLibre( colonne, tableau) :
 		return False
 
 # ajoute un jeton du joueur 1 sur une case		
-
-def placerJetonJoueur1(tab) :
-	colonne= int(input("colonne ?"))
-	while verifCaseLibre(colonne-1,tab) == False :
-		print("erreur, emplacement non disponible")
-		colonne=int(input("nouvelle colonne ?"))
+def placerJetonJoueur1(tab, column) :
+	if verifCaseLibre(column-1,tab) == False :
+		raise ValueError("erreur, emplacement non disponible")
 	i=5
-	while tab[i][colonne-1] !=0 :
+	while tab[i][column-1] !=0 :
 		i-=1
-	tab[i][colonne-1]=1
+	tab[i][column-1]=1
 	
-	# ajoute un jeton du joueur 2 sur une case
-	
+# ajoute un jeton du joueur 2 sur une case
 def placerJetonJoueur2(tab) :
 	colonne= int(input("colonne ?"))
 	while verifCaseLibre(colonne-1,tab) == False :
@@ -211,8 +206,6 @@ def main() :
 				placerJetonJoueur2(tab)
 				compte=compte+1
 		afficheTableau(tab)
-		
-main()
 
 
 	
