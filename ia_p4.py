@@ -23,3 +23,7 @@ def result(state, action):
 	transitional_board = state.copy()
 	p4.placerJeton(action[0], transitional_board, action[1])
 	return transitional_board
+
+def terminal_test(state):
+	"Test de terminaison (ou test terminal). Vrai si le jeu est fini dans l'etat (s)"
+	return p4.verifVictoire(state)
