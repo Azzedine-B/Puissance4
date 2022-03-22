@@ -4,7 +4,8 @@ import ia_p4
 
 class p4IaAlgorithms(unittest.TestCase):
 # A testcase is created by subclassing unittest.Tescase
-# The three individual tests are defined with methods whose names start with letters test
+# T
+# Tests are defined with methods whose names start with letters "test"
 # assertEquals() : to check for an expected result
 # assertTrue(), assertFalse() : to verify a condition
 # assertRaises() to verify that a specific exception gets raised
@@ -15,9 +16,46 @@ class p4IaAlgorithms(unittest.TestCase):
 
  
     def test_player(self):
+        # le plateau est vide, cr'est au joueur 1 de jouer
         self.assertEqual(ia_p4.player(self.board), 1)
-        p4.placerJetonJoueur1(self.board, 1)
+        # le joueur 1 joue
+        p4.placerJeton(1, self.board, 1)
+        # c'est au joueur 2 de jouer
         self.assertEqual(ia_p4.player(self.board), 2)
+
+
+    def test_action(self):
+        # lorsque le plateau est vide, toute les colonnes sont disponibles dans les actions
+        self.assertEqual(ia_p4.action(self.board), (1, 2, 3, 4, 5, 6, 7))
+        # on rempli un colonne de jetons
+        p4.placerJeton(1, self.board, 1)
+        p4.placerJeton(2, self.board, 1)
+        p4.placerJeton(1, self.board, 1)
+        p4.placerJeton(2, self.board, 1)
+        p4.placerJeton(1, self.board, 1)
+        p4.placerJeton(2, self.board, 1)
+        # la colonne n'est plus disponible dans les actions
+        self.assertEqual(ia_p4.action(self.board), (2, 3, 4, 5, 6, 7))
+
+    def test_result(self):
+        # le platrau vide est égal au plateau vide
+        initial_state = self.board.copy()
+        self.assertEqual(self.board.all(), initial_state.all())
+        # on rempli la 1ere colonne
+        p4.placerJeton(1, self.board, 1)
+        # le plateau est dans le meme etat en effectuant l'action
+        self.assertEqual(ia_p4.result(self.board, (1,1)).all(), self.board.all())
+
+        # on rempli la 3eme colonne
+        p4.placerJeton(2, self.board, 3)
+        # le plateau est dans le meme etat en effectuant l'action
+        self.assertEqual(ia_p4.result(self.board, (2,3)).all(), self.board.all())
+
+
+
+
+
+
 
 if __name__ == '__main__':
     unittest.main()

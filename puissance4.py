@@ -1,4 +1,4 @@
-
+import numpy as np
 # Creer la liste de toutes les combinaisons de 4 jetons sur l ensemble des lignes
 def verifVictoireLigne(tab) :
 	liste=[]
@@ -128,39 +128,27 @@ def verifVictoire(tab) :
 # Initialise la grille de jeu
 
 def initTableau() :
-	tableau= 6*[0]
-	for i in range (len(tableau)) :
-		tableau[i]=7*[0]
+	tableau = np.zeros((6,7))
 	return tableau
 
 # Verifier qu une case est libre
 
-def verifCaseLibre( colonne, tableau) :
+def verifCaseLibre(colonne, tableau) :
 	verite=True
 	if tableau[0][colonne]==0 :
 		return True
 	else :
 		return False
 
-# ajoute un jeton du joueur 1 sur une case		
-def placerJetonJoueur1(tab, column) :
+	
+# ajoute le jeton du joueur sur une case
+def placerJeton(numJoueur, tab, column) :
 	if verifCaseLibre(column-1,tab) == False :
 		raise ValueError("erreur, emplacement non disponible")
 	i=5
 	while tab[i][column-1] !=0 :
 		i-=1
-	tab[i][column-1]=1
-	
-# ajoute un jeton du joueur 2 sur une case
-def placerJetonJoueur2(tab) :
-	colonne= int(input("colonne ?"))
-	while verifCaseLibre(colonne-1,tab) == False :
-		print("erreur, emplacement non disponible")
-		colonne=int(input("nouvelle colonne ?"))
-	i=5
-	while tab[i][colonne-1] !=0 :
-		i-=1
-	tab[i][colonne-1]=2
+	tab[i][column-1]= numJoueur
 	
 	# Permet d afficher les jetons des joueurs par un X ou O
 	
@@ -206,9 +194,6 @@ def main() :
 				placerJetonJoueur2(tab)
 				compte=compte+1
 		afficheTableau(tab)
-
-
-	
 
 	
 	
