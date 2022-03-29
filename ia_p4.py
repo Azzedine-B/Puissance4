@@ -15,7 +15,7 @@ def action(state):
 	actions = []
 	for i in range(state.shape[1]):
 		if(p4.verifCaseLibre(i, state)):
-			actions.append(i + 1)
+			actions.append((player(state), i + 1))
 	return tuple(actions) # retour sous forme de tuple
 
 def result(state, action):
@@ -57,4 +57,5 @@ En plein milieu de partie, le programme verifie l'etat de jeu : il sait qu'il fa
 
 Definir une situation
 A partir de cette situation, definir un jeton
+
 """

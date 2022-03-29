@@ -42,7 +42,7 @@ class p4IaAlgorithms(unittest.TestCase):
 
 
     def test_action(self):
-        # lorsque le plateau est vide, toute les colonnes sont disponibles dans les actions
+        # lorsque le plateau est vide, toute les colonnes sont disponibles dans les actions pour le joueur donne
         self.assertEqual(ia_p4.action(self.board), (1, 2, 3, 4, 5, 6, 7))
         # on rempli un colonne de jetons
         self.filled_column()

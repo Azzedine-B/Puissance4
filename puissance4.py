@@ -149,23 +149,23 @@ def placerJeton(numJoueur, tab, column) :
 	
 	# Permet d afficher les jetons des joueurs par un X ou O
 	
-def affichageJeton(x) :
+def affichageJeton(x, symbol_player1, symbol_player2) :
 	if x==1 :
-		return ("X")
+		return symbol_player1
 	elif x==2 :
-		return("O")
+		return symbol_player2
 	else :
 		return(" ")
 
 # Permet d afficher la grille du jeu et son etat actuel
 
-def afficheTableau(tab) :
+def afficheTableau(tab, symbol_player1, symbol_player2) :
 	print("    |  C1  |  C2  |  C3  |  C4  |  C5   |  C6   |  C7 ", end='')
 	for i in range(6):
 		print("\n________________________________________________________")
 		print("L", (i+1), "|", end='')
 		for j in range(7) :
-			print(" ", affichageJeton(tab[i][j]), "  |", end='')
+			print(" ", affichageJeton(tab[i][j], symbol_player1, symbol_player2), "  |", end='')
 	print("\n")
 	
 #Main permettant de lancer le jeu
@@ -176,22 +176,24 @@ def main() :
 	while(True):
 		print("Qui commence ? (X ou O)")
 		caractere = input()
+		symbol_player1 = caractere
 		if(caractere == "X"):
-			num_player = 1
+			symbol_player2 = "O"
 			break
 		elif(caractere == "O"):
-			num_player = 2
+			symbol_player2 = "X"
 			break
 		else:
 			print("Caractere incorrect veuillez recommencer")
 
+	num_player = 1
 	while compte < 42:
-		afficheTableau(tab)
+		afficheTableau(tab, symbol_player1, symbol_player2)
 		if verifVictoire(tab)==True :
-			print("Victoire des " + ("X" if num_player == 2 else "O")) # numero inverse du joueur car il change en fin de boucle
+			print("Victoire des " + (symbol_player1 if num_player == 2 else symbol_player2)) # numero inverse du joueur car il change en fin de boucle
 			break
 		else :
-			print("Au tour des " + ("X" if num_player == 1 else "O"))
+			print("Au tour des " + (symbol_player1 if num_player == 1 else symbol_player2))
 			print("Entrez la colonne souhaite :")
 			column = int(input())
 			placerJeton(num_player, tab, column)
@@ -199,27 +201,10 @@ def main() :
 			num_player = 1 if num_player == 2 else 2
 
 main()
-
-"""
-Observations : 
-
-- Le jeu demande pas qui commence
-
-
-
-Idees de fonctionnement : 
-
-Qui commence ? 
-input : X ou O
-
-if(input == "X"):
-
-
-"""
 	
 	
 		
-		
+
 		
 		
 		
