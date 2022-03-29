@@ -21,7 +21,7 @@ class p4IaAlgorithms(unittest.TestCase):
         p4.placerJeton(2, self.board, 2)
         p4.placerJeton(1, self.board, 1)
         p4.placerJeton(2, self.board, 2)
-        p4.placerJeton(2, self.board, 2)
+        p4.placerJeton(1, self.board, 1)
 
     def filled_column(self):
         p4.placerJeton(1, self.board, 1)
@@ -33,7 +33,7 @@ class p4IaAlgorithms(unittest.TestCase):
 
 
     def test_player(self):
-        # le plateau est vide, cr'est au joueur 1 de jouer
+        # le plateau est vide, c'est au joueur 1 de jouer
         self.assertEqual(ia_p4.player(self.board), 1)
         # le joueur 1 joue
         p4.placerJeton(1, self.board, 1)
@@ -70,6 +70,50 @@ class p4IaAlgorithms(unittest.TestCase):
         # vrai après une victoire du joueur 1
         self.victory_scenario()
         self.assertTrue(ia_p4.terminal_test(self.board))
+
+
+    def test_utility(self):
+        # -1 pour le joueur 1 et 2 lorsque le plateau est vide
+        self.assertEqual(ia_p4.utility(self.board, 1), -1)
+        self.assertEqual(ia_p4.utility(self.board, 2), -1)
+
+
+        # le joueur 1 a gagne 
+        self.victory_scenario()
+
+        # 1 pour le joueur 1 et -1 pour le joueur 2
+        self.assertEqual(ia_p4.utility(self.board, 1), 1)
+        self.assertEqual(ia_p4.utility(self.board, 2), -1)
+
+
+    def test_successors(self):
+        # actions possible lorsque le plateau est vide : tout les colonnes peuvent acceuillir les jetons dans leur derniere ligne
+        actions_set = {}
+        p4.placerJeton(1, self.board, 1) # on place les jetons du joueur 1 pour generer actions_set necessaire au test
+
+        actions_set[1] = self.board 
+        p4.placerJeton(1, self.board, 2)
+
+        actions_set[2] = self.board
+        p4.placerJeton(1, self.board, 3)
+
+        actions_set[3] = self.board
+        p4.placerJeton(1, self.board, 4)
+
+        actions_set[4] = self.board
+        p4.placerJeton(1, self.board, 5)
+
+        actions_set[5] = self.board
+        p4.placerJeton(1, self.board, 6)
+        actions_set[6] = self.board
+
+        self.assertEqual(ia_p4.successors(self.board), actions_set)
+
+
+
+
+
+
 
 
 

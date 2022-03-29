@@ -16,7 +16,7 @@ def action(state):
 	for i in range(state.shape[1]):
 		if(p4.verifCaseLibre(i, state)):
 			actions.append(i + 1)
-	return tuple(actions)
+	return tuple(actions) # retour sous forme de tuple
 
 def result(state, action):
 	"Fonction de transition qui definit quel est le resultat de l'action (a) dans l'etat (state)"
@@ -27,3 +27,34 @@ def result(state, action):
 def terminal_test(state):
 	"Test de terminaison (ou test terminal). Vrai si le jeu est fini dans l'etat (s)"
 	return p4.verifVictoire(state)
+
+def utility(state, num_player):
+	if(terminal_test(state) and player(state) != num_player):
+		return 1
+	else:
+		return -1
+
+def successors(state):
+	"Retourne l'ensemble des actions et des etats qu'elles generent a partir d'un etat (s)"
+	actions_state = {}
+	actions_set = action(state)
+	for a in actions_set:
+		actions_state[a] = result(state, a)
+	return actions_state
+
+
+
+
+"""
+Faire une fonction qui place le jeton adequate en fonction de l'etat de jeu.
+
+Exemple :
+
+Si le jeu commence et que c'est au joueur 1 de commencer : le programme sait qu'il faut placer le jeton du joueur 1
+En plein milieu de partie, le programme verifie l'etat de jeu : il sait qu'il faut placer tel jeton  selon cette situation
+
+--> une situation : le bon jeton
+
+Definir une situation
+A partir de cette situation, definir un jeton
+"""

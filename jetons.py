@@ -94,12 +94,6 @@ def utility(state, nb_player):
 		return -1
 	else:
 		return 1
-	"""
-	if(player(state) == nb_player and not terminal_test(state)):
-		return 1
-	elif(player(state) != nb_player and terminal_test(state)):
-		return -1
-	"""
 
 def successors(state): 
 	"Retourne l'ensemble des actions et des etats qu'elles generent a partir d'un etat (s)"

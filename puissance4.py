@@ -117,7 +117,6 @@ def verifVictoireDiago(tab) :
 	
 
 #Verifie que la liste des combinaisons ne contient pas une combinaison gagnante
-
 def verifVictoire(tab) :
 	liste = verifVictoireColonne(tab) + verifVictoireLigne(tab) + verifVictoireDiago(tab)
 	if [1,1,1,1] in liste or [2,2,2,2] in liste :
@@ -126,18 +125,16 @@ def verifVictoire(tab) :
 		return False
 
 # Initialise la grille de jeu
-
 def initTableau() :
 	tableau = np.zeros((6,7))
 	return tableau
 
 # Verifier qu une case est libre
-
 def verifCaseLibre(colonne, tableau) :
 	verite=True
 	if tableau[0][colonne]==0 :
 		return True
-	else :
+	else:
 		return False
 
 	
@@ -176,26 +173,49 @@ def afficheTableau(tab) :
 def main() :
 	tab=initTableau()
 	compte=0
-	while compte <42   :
-		afficheTableau(tab)
-		if compte%2 ==0 and verifVictoire(tab)==True :
-			print("Victoire du joueur 2 !")
+	while(True):
+		print("Qui commence ? (X ou O)")
+		caractere = input()
+		if(caractere == "X"):
+			num_player = 1
 			break
-		elif compte%2==1 and verifVictoire(tab)==True :
-			print("Victoire du joueur 1 !")
+		elif(caractere == "O"):
+			num_player = 2
+			break
+		else:
+			print("Caractere incorrect veuillez recommencer")
+
+	while compte < 42:
+		afficheTableau(tab)
+		if verifVictoire(tab)==True :
+			print("Victoire des " + ("X" if num_player == 2 else "O")) # numero inverse du joueur car il change en fin de boucle
 			break
 		else :
-			if compte%2 ==0 :
-				print("tour du joueur 1")
-				placerJetonJoueur1(tab)
-				compte=compte+1
-			else :
-				print("tour du joueur 2")
-				placerJetonJoueur2(tab)
-				compte=compte+1
-		afficheTableau(tab)
+			print("Au tour des " + ("X" if num_player == 1 else "O"))
+			print("Entrez la colonne souhaite :")
+			column = int(input())
+			placerJeton(num_player, tab, column)
+			compte=compte+1
+			num_player = 1 if num_player == 2 else 2
 
-	
+main()
+
+"""
+Observations : 
+
+- Le jeu demande pas qui commence
+
+
+
+Idees de fonctionnement : 
+
+Qui commence ? 
+input : X ou O
+
+if(input == "X"):
+
+
+"""
 	
 	
 		
