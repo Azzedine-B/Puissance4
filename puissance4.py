@@ -210,8 +210,7 @@ def main() :
 """
 Le match nul n'est pas gere
 """
-	
-main()
+
 	
 		
 

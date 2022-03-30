@@ -26,13 +26,21 @@ def result(state, action):
 
 def terminal_test(state):
 	"Test de terminaison (ou test terminal). Vrai si le jeu est fini dans l'etat (s)"
+	"""
+	terminal test si : 
+		- victoire
+		- match nul
+
+	victoire : p4.verifVictoire(state)
+	match nul : ???
+	"""
 	return p4.verifVictoire(state)
 
 def utility(state, num_player):
 	"Fonction d'utilité : associe une valeur numérique a chaque etat terminal (s) pour un joueur (p)"
-	if(terminal_test(state) and player(state) != num_player):
+	if(p4.verifVictoire(state) and player(state) != num_player):
 		return 1
-	elif(terminal_test(state) and player == num_player):
+	elif(p4.verifVictoire(state) and player(state) == num_player):
 		return -1
 	else:
 		return 0
