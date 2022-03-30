@@ -14,7 +14,7 @@ class p4IaAlgorithms(unittest.TestCase):
     def setUp(self):
         self.board = p4.initTableau()
 
-    def victory_scenario(self):
+    def victory_scenario_player1(self):
         p4.placerJeton(1, self.board, 1)
         p4.placerJeton(2, self.board, 2)
         p4.placerJeton(1, self.board, 1)
@@ -22,6 +22,38 @@ class p4IaAlgorithms(unittest.TestCase):
         p4.placerJeton(1, self.board, 1)
         p4.placerJeton(2, self.board, 2)
         p4.placerJeton(1, self.board, 1)
+
+    def victory_scenario_player2(self):
+        p4.placerJeton(1, self.board, 1)
+        p4.placerJeton(2, self.board, 2)
+        p4.placerJeton(1, self.board, 1)
+        p4.placerJeton(2, self.board, 2)
+        p4.placerJeton(1, self.board, 1)
+        p4.placerJeton(2, self.board, 2)
+        p4.placerJeton(1, self.board, 3)
+        p4.placerJeton(1, self.board, 2)
+
+    def draw_scenario(self):
+        switch = True
+        for i in range(1, 7):
+            for j in range(1, 8, 2):
+                if(switch):
+                    p4.placerJeton(1, self.board, j)
+                    switch = False
+                else:
+                    p4.placerJeton(2, self.board, j)
+                    switch = True
+            for j in range(2, 8, 2):
+                if(switch):
+                    p4.placerJeton(1, self.board, j)
+                    switch = False
+                else:
+                    p4.placerJeton(2, self.board, j)
+                    switch = True
+
+        print(self.board)
+
+
 
     def filled_column(self):
         p4.placerJeton(1, self.board, 1)
@@ -42,12 +74,12 @@ class p4IaAlgorithms(unittest.TestCase):
 
 
     def test_action(self):
-        # lorsque le plateau est vide, toute les colonnes sont disponibles dans les actions pour le joueur donne
-        self.assertEqual(ia_p4.action(self.board), (1, 2, 3, 4, 5, 6, 7))
+        # lorsque le plateau est vide, toute les colonnes sont disponibles dans les actions pour le joueur 1
+        self.assertEqual(ia_p4.action(self.board), ((1,1), (1,2), (1,3), (1,4), (1,5), (1,6), (1,7)))
         # on rempli un colonne de jetons
         self.filled_column()
-        # la colonne n'est plus disponible dans les actions
-        self.assertEqual(ia_p4.action(self.board), (2, 3, 4, 5, 6, 7))
+        # la colonne n'est plus disponible dans les actions pour le joueur 1
+        self.assertEqual(ia_p4.action(self.board), ((1,2), (1,3), (1,4), (1,5), (1,6), (1,7)))
 
     def test_result(self):
         # le plateau vide est égal au plateau vide
@@ -68,7 +100,7 @@ class p4IaAlgorithms(unittest.TestCase):
         self.assertFalse(ia_p4.terminal_test(self.board))
 
         # vrai après une victoire du joueur 1
-        self.victory_scenario()
+        self.victory_scenario_player1()
         self.assertTrue(ia_p4.terminal_test(self.board))
 
 
@@ -79,47 +111,41 @@ class p4IaAlgorithms(unittest.TestCase):
 
 
         # le joueur 1 a gagne 
-        self.victory_scenario()
+        self.victory_scenario_player1()
 
         # 1 pour le joueur 1 et -1 pour le joueur 2
         self.assertEqual(ia_p4.utility(self.board, 1), 1)
         self.assertEqual(ia_p4.utility(self.board, 2), -1)
 
 
+    def test_utility_draw(self):
+        # 0 pour les deux joueur lors d'un match nul
+        self.assertEqual(ia_p4.utility(self.board, 1), 0)
+        self.assertEqual(ia_p4.utility(self.board, 2), 0)
+
     def test_successors(self):
-        # actions possible lorsque le plateau est vide : tout les colonnes peuvent acceuillir les jetons dans leur derniere ligne
+        # actions possible lorsque le plateau est vide : toutes les colonnes peuvent acceuillir les jetons dans leur derniere ligne
         actions_set = {}
-        p4.placerJeton(1, self.board, 1) # on place les jetons du joueur 1 pour generer actions_set necessaire au test
 
-        actions_set[1] = self.board 
-        p4.placerJeton(1, self.board, 2)
+        for i in range(1, 8):
+            plateau = p4.initTableau()
+            p4.placerJeton(1, plateau, i) # on place les jetons du joueur 1 pour generer actions_set necessaire au test
+            actions_set[(1,i)] = plateau
 
-        actions_set[2] = self.board
-        p4.placerJeton(1, self.board, 3)
+        self.assertTrue(ia_p4.successors(self.board), actions_set)
 
-        actions_set[3] = self.board
-        p4.placerJeton(1, self.board, 4)
+    def test_min_value(self):
 
-        actions_set[4] = self.board
-        p4.placerJeton(1, self.board, 5)
+        # - 1 d'utilite pour le joueur 2 lorsque la partie commence
+        self.assertEqual(ia_p4.min_value(self.board, 2), -1)
 
-        actions_set[5] = self.board
-        p4.placerJeton(1, self.board, 6)
-        actions_set[6] = self.board
+        print(self.draw_scenario())
 
-        self.assertEqual(ia_p4.successors(self.board), actions_set)
-
-
-
-
-
-
-
-
-
-
-
-
+"""
+        # 1 d'utilite pour le joueur 1 lorsqu'il a gagne
+        self.victory_scenario_player1()
+        self.assertEqual(ia_p4.min_value(self.board, 1), 1)
+"""
 
 
 if __name__ == '__main__':

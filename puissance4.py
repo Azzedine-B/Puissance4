@@ -187,8 +187,8 @@ def main() :
 			print("Caractere incorrect veuillez recommencer")
 
 	num_player = 1
+	afficheTableau(tab, symbol_player1, symbol_player2)
 	while compte < 42:
-		afficheTableau(tab, symbol_player1, symbol_player2)
 		if verifVictoire(tab)==True :
 			print("Victoire des " + (symbol_player1 if num_player == 2 else symbol_player2)) # numero inverse du joueur car il change en fin de boucle
 			break
@@ -199,9 +199,19 @@ def main() :
 			placerJeton(num_player, tab, column)
 			compte=compte+1
 			num_player = 1 if num_player == 2 else 2
+		afficheTableau(tab, symbol_player1, symbol_player2)
 
-main()
+	if(not verifVictoire(tab)):
+		print("Match nul")
+
+
+
+
+"""
+Le match nul n'est pas gere
+"""
 	
+main()
 	
 		
 
