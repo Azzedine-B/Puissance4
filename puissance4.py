@@ -124,6 +124,13 @@ def verifVictoire(tab) :
 	else :
 		return False
 
+def empty_board(board):
+	for i in range(board.shape[0]):
+		for j in range(board.shape[1]):
+			if(board[i,j] == 0):
+				return False
+	return True
+
 # Initialise la grille de jeu
 def initTableau() :
 	tableau = np.zeros((6,7))
@@ -172,7 +179,6 @@ def afficheTableau(tab, symbol_player1, symbol_player2) :
 
 def main() :
 	tab=initTableau()
-	compte=0
 	while(True):
 		print("Qui commence ? (X ou O)")
 		caractere = input()
@@ -188,23 +194,23 @@ def main() :
 
 	num_player = 1
 	afficheTableau(tab, symbol_player1, symbol_player2)
-	while compte < 42:
+	while True:
 		if verifVictoire(tab)==True :
 			print("Victoire des " + (symbol_player1 if num_player == 2 else symbol_player2)) # numero inverse du joueur car il change en fin de boucle
+			break
+		elif empty_board(tab) and not verifVictoire(tab):
+			print("Match nul")
 			break
 		else :
 			print("Au tour des " + (symbol_player1 if num_player == 1 else symbol_player2))
 			print("Entrez la colonne souhaite :")
 			column = int(input())
 			placerJeton(num_player, tab, column)
-			compte=compte+1
+			# compte=compte+1
 			num_player = 1 if num_player == 2 else 2
 		afficheTableau(tab, symbol_player1, symbol_player2)
 
-	if(not verifVictoire(tab)):
-		print("Match nul")
-
-
+main()
 
 
 """

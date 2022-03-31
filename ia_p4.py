@@ -53,27 +53,23 @@ def successors(state):
 		actions_state[a] = result(state, a)
 	return actions_state
 
-def min_value(state): # opposing_player_number correspond au numero du joueur adverse
+def min_value(state):
 	"Minimise l'utilite adverse"
 	if terminal_test(state):
-		# print("je suis passe par terminal test de max_value")
-		return utility(state, 1) 
+		return utility(state, 2) 
 	v = 1000
 	results = []
-	for a, s in successors(state).items():
-		print(s)
+	for a, s in successors(state).items(): # a : action, s : state
 		v = min(v, max_value(s))
 	return v
 
-def max_value(state): # opposing_player_number correspond au numero du joueur adverse
+def max_value(state): 
 	"Maximise l'utilite"
 	if terminal_test(state):
-		# print("je suis passe par terminal test de min_value")
-		return utility(state, 1)
+		return utility(state, 2)
 	v = -1000
 	results = []
 	for a, s in successors(state).items(): # a : action, s : state
-		print(s)
 		v = max(v, min_value(s))
 	return v
 
@@ -86,7 +82,5 @@ def minimax_descision(state):
 	return max_key
 
 """
-Minimax_decision doit obligatoirement prendre en parametre le numero du joueur ??
-
-elle utilise min_value et max_value qui utilisent elles-mêmes utility(s,p) 
+Trouver le problème du bloquage de minimax_decision 
 """
