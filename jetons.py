@@ -106,7 +106,7 @@ def successors(state):
 def min_value(state):
 	"Minimise l'utilite adverse"
 	if terminal_test(state):
-		return utility(state, 1) # s'il s'agit du tour du joueur 1 alors renvoi -1 sinon 1 : donc on peut mettre 1 ou 2
+		return utility(state, 1) # s'il s'agit du tour du joueur 1 alors renvoi -1 sinon 1
 	v = 1000
 	results = []
 	for a, s in successors(state).items():
@@ -116,7 +116,7 @@ def min_value(state):
 def max_value(state):
 	"Maximise l'utilite"
 	if terminal_test(state):
-		return utility(state, 1) # s'il s'agit du tour du joueur 1 alors renvoi -1 sinon 1 : donc on peux mettre 1 ou 2
+		return utility(state, 1) # s'il s'agit du tour du joueur 1 alors renvoi -1 sinon 1 : donc on peux
 	v = -1000
 	results = []
 	for a, s in successors(state).items(): # a : action, s : state
@@ -129,7 +129,9 @@ def minimax_descision(state):
 	for a in action(state):
 		results[a] = min_value(result(state, a))
 	max_key = max(results, key= results.get)
+	print(results)
 	return max_key
+
 
 def main():
 	"Boucle de jeu"

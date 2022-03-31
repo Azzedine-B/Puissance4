@@ -124,7 +124,7 @@ def verifVictoire(tab) :
 	else :
 		return False
 
-def empty_board(board):
+def fulled_board(board):
 	for i in range(board.shape[0]):
 		for j in range(board.shape[1]):
 			if(board[i,j] == 0):
@@ -198,7 +198,7 @@ def main() :
 		if verifVictoire(tab)==True :
 			print("Victoire des " + (symbol_player1 if num_player == 2 else symbol_player2)) # numero inverse du joueur car il change en fin de boucle
 			break
-		elif empty_board(tab) and not verifVictoire(tab):
+		elif fulled_board(tab) and not verifVictoire(tab):
 			print("Match nul")
 			break
 		else :
@@ -209,8 +209,6 @@ def main() :
 			# compte=compte+1
 			num_player = 1 if num_player == 2 else 2
 		afficheTableau(tab, symbol_player1, symbol_player2)
-
-main()
 
 
 """
