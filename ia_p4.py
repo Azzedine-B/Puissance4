@@ -69,6 +69,13 @@ def alignment_evaluation(state, alignment, num_player):
 	if 1 in alignment and 2 in alignment:
 		return 0
 	elif((1 in alignment and not 2 in alignment) or (2 in alignment and not 1 in alignment)):
+
+		# continuer a réfléchir sur ce problème
+		if(num_player in alignment and not 0 in alignment):
+			return 10000
+		elif(not num_player in alignment and not 0 in alignment):
+			return -10000
+
 		evaluation = 1
 
 		for i in range(4):
@@ -132,13 +139,14 @@ def minimax_descision(state, depth): # cutoff_test and evaluation
 	results = {}
 	for a in action(state):
 		results[a] = min_value(state, result(state, a), depth)
+	print(results)
 	max_key = max(results, key= results.get)
 	return max_key
 
 def min_value(initial_state, state, depth): # cutoff_test and evaluation
 	"Minimise l'utilite adverse"
 	if cutoff_test(initial_state, state, depth):
-		return evaluation(state, player(state)) 
+		return evaluation(state, 1 if player(state) == 2 else 2) 
 	v = math.inf
 	for a, s in successors(state).items(): # a : action, s : state
 		v = min(v, max_value(initial_state ,s, depth))
@@ -209,7 +217,6 @@ main()
 
 
 
-
 """
 Fonction heuristique pour le puissance 4 :
 -----------------------------------------
@@ -238,6 +245,20 @@ Validité de l'heuristique :
 
 
 L'heuristique bloque litérallement tous les coups mais peine a gagner
+
+Interpretation des résultats :
+On rappel que MAX maximise ce que MIN minimise
+
+- Une IA qui bloque tous les coups :
+le coup qui bloque est le max qu'il puisse faire par rapport a tous ce que min remonte
+--> tres bien, c'est ce qui est attendu d'une bonne IA
+
+- IA qui peine a gagner :
+3 alignements deja disponible, c'est au tour de l'IA de jouer, pourtant elle ne choisi pas de gagner
+--> un autre coup est plus avantageux 
+voyons voir
+Selon les resultats observées, elle ne choisi par la possibilité à près 10000 : c'est étrange
+La fonction continue d'aller en profondeur meme quand le jeu est terminée
 """
 
 # sys.setrecursionlimit(10**9)
