@@ -1,4 +1,5 @@
 import numpy as np
+
 # Creer la liste de toutes les combinaisons de 4 jetons sur l ensemble des lignes
 def verifVictoireLigne(tab) :
 	liste=[]
@@ -131,6 +132,15 @@ def fulled_board(board):
 				return False
 	return True
 
+def number_of_pawns(board):
+	number_of_pawns = 0
+	for i in range(board.shape[0]):
+		for j in range(board.shape[1]):
+			if(board[i,j] == 1 or board[i,j] == 2):
+				number_of_pawns += 1
+
+	return number_of_pawns
+
 # Initialise la grille de jeu
 def initTableau() :
 	tableau = np.zeros((6,7))
@@ -174,50 +184,3 @@ def afficheTableau(tab, symbol_player1, symbol_player2) :
 		for j in range(7) :
 			print(" ", affichageJeton(tab[i][j], symbol_player1, symbol_player2), "  |", end='')
 	print("\n")
-	
-#Main permettant de lancer le jeu
-
-def main() :
-	tab=initTableau()
-	while(True):
-		print("Qui commence ? (X ou O)")
-		caractere = input()
-		symbol_player1 = caractere
-		if(caractere == "X"):
-			symbol_player2 = "O"
-			break
-		elif(caractere == "O"):
-			symbol_player2 = "X"
-			break
-		else:
-			print("Caractere incorrect veuillez recommencer")
-
-	num_player = 1
-	afficheTableau(tab, symbol_player1, symbol_player2)
-	while True:
-		if verifVictoire(tab)==True :
-			print("Victoire des " + (symbol_player1 if num_player == 2 else symbol_player2)) # numero inverse du joueur car il change en fin de boucle
-			break
-		elif fulled_board(tab) and not verifVictoire(tab):
-			print("Match nul")
-			break
-		else :
-			print("Au tour des " + (symbol_player1 if num_player == 1 else symbol_player2))
-			print("Entrez la colonne souhaite :")
-			column = int(input())
-			placerJeton(num_player, tab, column)
-			# compte=compte+1
-			num_player = 1 if num_player == 2 else 2
-		afficheTableau(tab, symbol_player1, symbol_player2)
-
-
-"""
-Le match nul n'est pas gere
-"""
-
-	
-		
-
-		
-		
-		
