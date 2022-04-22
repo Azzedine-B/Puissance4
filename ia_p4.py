@@ -167,50 +167,59 @@ def max_value(initial_state, state, depth): # cutoff_test and evaluation
 
 def main() :
 	tab= p4.initTableau()
+	choice = 0
+	token_player1 = ""
+	token_player2 = ""
 	while(True):
-		print("Qui commence ? (IA ou Humain)")
-		response = input()
-		if(response == "IA"):
-			human_turn = 2
-		elif(response == "Humain"):
-			human_turn = 1
-		else:
-			print("Je n'ai pas compris votre choix, merci de bien vouloir recommencer")
+		while(not (choice == 1 or choice == 2)):
+			print("Qui commence ?")
+			print("1. IA")
+			print("2. Humain")
+			try:
+				choice = int(input("Saisissez votre choix : "))
+				if(choice != 1 and choice != 2):
+					print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
+				else:
+					human_turn = 1 if choice == 2 else 2
+					break
+			except ValueError:
+				print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
 
-		print(response, " Veuillez choisir votre jeton (X ou O)")
 
-		token = input()
-		token_player1 = token
-		if(token == "X"):
+		if(choice == 1):
+			print("L'IA a choisi la X, vous aurez donc le O")
+			token_player1 = "X"
 			token_player2 = "O"
-			break
-		elif(token == "O"):
-			token_player2 = "X"
-			break
 		else:
-			print("Caractere incorrect veuillez recommencer")
+			token = ""
+			while(not (token == "X" or token == "O")):
+				print("Veuillez choisir votre symbole (X ou O)")
+				token = input()
 
-	# num_player = 1
-	p4.afficheTableau(tab, token_player1, token_player2)
-	while True:
-		if p4.verifVictoire(tab)==True :
-			print("Victoire des " + (token_player1 if player(tab) == 2 else token_player2)) # numero inverse du joueur car il change en fin de boucle
-			break
-		elif p4.fulled_board(tab) and not p4.verifVictoire(tab):
-			print("Match nul")
-			break
-		else :
-			print("Au tour des " + (token_player1 if player(tab)  == 1 else token_player2))
-			if(player(tab) == human_turn):
-				print("Entrez la colonne souhaite :")
-				column = int(input())
-				p4.placerJeton(player(tab), tab, column)
-			else:
-				action = minimax_descision(tab, 4)
-				p4.placerJeton(action[0], tab, action[1])
-			# compte=compte+1
-			# num_player = 1 if num_player == 2 else 2
+				if(token != "X" and token != "O"):
+					print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
+				else:
+					token_player1 = token
+					token_player2 = "X" if token_player1 == "O" else "O"
+
 		p4.afficheTableau(tab, token_player1, token_player2)
+		while True:
+			if p4.verifVictoire(tab)==True :
+				print("Victoire des " + (token_player1 if player(tab) == 2 else token_player2)) # numero inverse du joueur car il change en fin de boucle
+				break
+			elif p4.fulled_board(tab) and not p4.verifVictoire(tab):
+				print("Match nul")
+				break
+			else :
+				print("Au tour des " + (token_player1 if player(tab)  == 1 else token_player2))
+				if(player(tab) == human_turn):
+					print("Entrez la colonne souhaite :")
+					column = int(input())
+					p4.placerJeton(player(tab), tab, column)
+				else:
+					action = minimax_descision(tab, 1)
+					p4.placerJeton(action[0], tab, action[1])
+			p4.afficheTableau(tab, token_player1, token_player2)
 
 
 main()
