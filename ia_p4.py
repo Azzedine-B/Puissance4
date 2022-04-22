@@ -108,9 +108,8 @@ On remplace utility(state, num_player) par evaluation(state, num_player)
 Principe :
 ----------
 On parcours tout le plateau
-Seul les alignements de 4 pions ou les alignement ou il les configurations ou il encore possible
-d'obtenir un alignement de 4 pions sont consideres.
-Leurs resultats sont positif (en faveur du joueur qui calcul l'utilite) ou negatif (en sa defaveur)
+Seul les alignements ou il encore possible d'obtenir un alignement de 4 pions ou les alignements de 4 pions sont consideres.
+Leurs resultats peuvent etre positif (en faveur du joueur qui calcul l'utilite) , negatif (en sa defaveur) ou nul si un alignement est posible mais qu'aucun pion n'es inséré
 On calcul l'utilite de chaque pion dans toutes les directions cardinales possibles : Nord, Sud, Est, Ouest, Nord-Est, Nord-Ouest, Sud-Est, Sud-Ouest
 L'utilite d'un pion est la somme de ses utilites dans les directions citees precedement
 L'utilite total du plateau est la somme de toutes les utilites de chaque pions 
@@ -183,10 +182,10 @@ def main() :
 					human_turn = 1 if choice == 2 else 2
 					break
 			except ValueError:
-				print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
+				print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
 
 
-		if(choice == 1):
+		if(choice == 1): # faire un tirage aléatoire ici
 			print("L'IA a choisi la X, vous aurez donc le O")
 			token_player1 = "X"
 			token_player2 = "O"
@@ -201,6 +200,20 @@ def main() :
 				else:
 					token_player1 = token
 					token_player2 = "X" if token_player1 == "O" else "O"
+
+		difficulty = 0
+		while(not (difficulty == 1 or difficulty == 2 or difficulty == 3)):
+			print("Veuillez choisir la difficulté de l'IA")
+			print("1. Facile")
+			print("2. Moyen")
+			print("3. Forte")
+			try:
+				difficulty = int(input("Saisissez votre choix : "))
+				if(difficulty != 1 and difficulty != 2 and difficulty != 3):
+					print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
+					break
+			except ValueError:
+				print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
 
 		p4.afficheTableau(tab, token_player1, token_player2)
 		while True:
