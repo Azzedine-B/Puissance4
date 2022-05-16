@@ -1,6 +1,7 @@
 import math
 import puissance4 as p4
 import random
+import interface
 
 def player(state):
 	"Definie quel joueur doit jouer dans l'etat (s)"
@@ -18,7 +19,7 @@ def action(state):
 		if(p4.verifCaseLibre(i, state)):
 			actions.append((player(state), i + 1))
 	return tuple(actions) # retour sous forme de tuple
-
+ 
 def result(state, action):
 	"Fonction de transition qui definit quel est le resultat de l'action (a) dans l'etat (state)"
 	transitional_board = state.copy()
@@ -94,7 +95,6 @@ def successors(state):
 
 
 def alpha_beta_decision(state, depth):
-	# choisir aleatoirement un des resultats max
 	results = {}
 	for a in action(state):
 		results[a] = min_value(state, result(state, a), -math.inf, math.inf, depth)
@@ -116,7 +116,7 @@ def max_value(initial_state, state, alpha, beta, depth):
 	v = - math.inf
 	for a, s in successors(state).items(): # a : action, s : state
 		v = max(v, min_value(initial_state, result(state, a), alpha, beta, depth))
-		if(v >= beta): # Si V est pire que beta, MIN va l’eviter --> elaguer la branche
+		if(v >= beta): # If v is worse than beta, MIN will avoid it --> prune the branch
 			return v
 		alpha = max(alpha, v)
 	return v
@@ -133,99 +133,68 @@ def min_value(initial_state, state, alpha, beta, depth):
 	v = math.inf
 	for a, s in successors(state).items(): # a : action, s : state
 		v = min(v, max_value(initial_state, s, alpha, beta, depth))
-		if(v <= alpha): # Si V est pire que alpha, MAX va l’eviter --> elaguer la branche
+		if(v <= alpha): # If v is worse than alpha, MAX will avoid it --> prune the branch
 			return v
 		beta = min(beta, v)
 	return v
 
+def game(): 
+	tab= p4.initTableau()
+	choice = interface.choose_who_begin()
+
+	human_turn = 1 if choice == 2 else 2
+
+	if(choice == 1): # if the AI starts, chooses a token randomly and assigns the remaining token to the player
+		token_player1 = interface.choose_random_token()
+		token_player2 = interface.choose_remaining_token(token_player1)
+		print("L'IA a choisi les {}, vous aurez donc les {}".format(token_player1, token_player2))
+	else: # 
+		token_player1 = interface.choose_human_token()
+		token_player2 = interface.choose_remaining_token(token_player1)
+		print("Vous avez choisi les {}, l'IA aura donc les {}".format(token_player1, token_player2))
+
+	difficulty = interface.choose_difficulty()
+
+	# chooses the depth according to the difficulty
+	if(difficulty == 1):
+		depth = 2
+	elif(difficulty == 2):
+		depth = 3
+	else:
+		depth = 5
+
+	p4.afficheTableau(tab, token_player1, token_player2)
+	while True:
+		if p4.verifVictoire(tab)==True :
+			print("Victoire des " + (token_player1 if player(tab) == 2 else token_player2)) # inverse number of the player because it changes at the end of the loop
+			break
+		elif p4.fulled_board(tab) and not p4.verifVictoire(tab):
+			print("Match nul")
+			break
+		else:
+			print("Au tour des " + (token_player1 if player(tab)  == 1 else token_player2))
+			if(player(tab) == human_turn):
+				column = interface.player_turn()
+				p4.placerJeton(player(tab), tab, column)
+			else:
+				action = alpha_beta_decision(tab, depth)
+				p4.placerJeton(action[0], tab, action[1])
+		p4.afficheTableau(tab, token_player1, token_player2)
 
 
 #Main permettant de lancer le jeu
 def main() :
-	tab= p4.initTableau()
-	choice = 0
-	token_player1 = ""
-	token_player2 = ""
-	while(True):
-		while(not (choice == 1 or choice == 2)):
-			print("Qui commence ?")
-			print("1. IA")
-			print("2. Humain")
-			try:
-				choice = int(input("Saisissez votre choix : "))
-				if(choice != 1 and choice != 2):
-					print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
-				else:
-					human_turn = 1 if choice == 2 else 2
-					break
-			except ValueError:
-				print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
-
-
-		if(choice == 1): # faire un tirage aléatoire ici
-			print("L'IA a choisi la X, vous aurez donc le O")
-			token_player1 = "X"
-			token_player2 = "O"
-		else:
-			token = ""
-			while(not (token == "X" or token == "O")):
-				print("Veuillez choisir votre symbole (X ou O)")
-				token = input()
-
-				if(token != "X" and token != "O"):
-					print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
-				else:
-					token_player1 = token
-					token_player2 = "X" if token_player1 == "O" else "O"
-
-		difficulty = 0
-		while(not (difficulty == 1 or difficulty == 2 or difficulty == 3)):
-			print("Veuillez choisir la difficulté de l'IA")
-			print("1. Facile")
-			print("2. Moyen")
-			print("3. Forte")
-			try:
-				difficulty = int(input("Saisissez votre choix : "))
-				if(difficulty != 1 and difficulty != 2 and difficulty != 3):
-					print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
-					break
-			except ValueError:
-				print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
-
-		if(difficulty == 1):
-			depth = 2
-		elif(difficulty == 2):
-			depth = 3
-		else:
-			depth = 5
-
-		p4.afficheTableau(tab, token_player1, token_player2)
-		while True:
-			if p4.verifVictoire(tab)==True :
-				print("Victoire des " + (token_player1 if player(tab) == 2 else token_player2)) # numero inverse du joueur car il change en fin de boucle
-				break
-			elif p4.fulled_board(tab) and not p4.verifVictoire(tab):
-				print("Match nul")
-				break
-			else:
-				print("Au tour des " + (token_player1 if player(tab)  == 1 else token_player2))
-				if(player(tab) == human_turn):
-					column = 0
-					while(column <= 0 or column > 7):
-						print("Entrez la colonne souhaite :")
-						try:
-							column = int(input())
-							if(column < 0 and column > 7):
-								print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
-							else:
-								p4.placerJeton(player(tab), tab, column)
-							break
-						except ValueError:
-							print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
-				else:
-					action = alpha_beta_decision(tab, depth)
-					p4.placerJeton(action[0], tab, action[1])
-			p4.afficheTableau(tab, token_player1, token_player2)
+	choice = 1
+	while(choice != 0):
+		game()
+		print("Voulez-vous recommencer ?")
+		print("Entrez 0 pour quitter")
+		print("Ou tout autre chiffre pour continuer")
+		try:
+			choice = int(input())
+		except ValueError:
+			print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
+	
 
 
 main()
