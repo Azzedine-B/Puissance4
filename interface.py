@@ -11,17 +11,18 @@ def display_difficulty():
 	print("2. Moyen")
 	print("3. Forte")
 
+
+
 def choose_who_begin():
 	choice = 0
-	while(not (choice == 1 or choice == 2)):
-		display_who_begin()
+	display_who_begin()
+	while(choice != 1 or choice != 2):
 		try:
 			choice = int(input("Saisissez votre choix : "))
 			if(choice != 1 and choice != 2):
 				print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
 			else:
 				return choice
-				break
 		except ValueError:
 			print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
 
@@ -35,8 +36,8 @@ def choose_remaining_token(choosen_token):
 
 def choose_human_token():
 	token = ""
+	print("Veuillez choisir votre symbole (X ou O)")
 	while(not (token == "X" or token == "O")):
-		print("Veuillez choisir votre symbole (X ou O)")
 		token = input()
 
 		if(token != "X" and token != "O"):
@@ -46,15 +47,32 @@ def choose_human_token():
 
 def choose_difficulty():
 	difficulty = 0
-	while(not (difficulty == 1 or difficulty == 2 or difficulty == 3)):
+	while(difficulty != 1 and difficulty != 2 and difficulty != 3):
 		try:
 			display_difficulty()
 			difficulty = int(input("Saisissez votre choix : "))
 			if(difficulty != 1 and difficulty != 2 and difficulty != 3):
 				print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
-				break
+			else:
+				return difficulty
 		except ValueError:
 			print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
+
+def token_distribution(choice):
+	if(choice == 1): # if the AI starts, chooses a token randomly and assigns the remaining token to the player
+		token_player1 = choose_random_token()
+		token_player2 = choose_remaining_token(token_player1)
+		print("L'IA a choisi les {}, vous aurez donc les {}".format(token_player1, token_player2))
+	else: # 
+		token_player1 = choose_human_token()
+		token_player2 = choose_remaining_token(token_player1)
+		print("Vous avez choisi les {}, l'IA aura donc les {}".format(token_player1, token_player2))
+
+	return token_player1, token_player2
+
+def determine_depth(difficulty):
+	"""chooses the depth according to the difficulty"""
+	return 3 if difficulty == 2 else 5
 
 def player_turn():
 	column = 0
