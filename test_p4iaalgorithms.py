@@ -4,7 +4,6 @@ import ia_p4
 
 class p4IaAlgorithms(unittest.TestCase):
 # A testcase is created by subclassing unittest.Tescase
-# T
 # Tests are defined with methods whose names start with letters "test"
 # assertEquals() : to check for an expected result
 # assertTrue(), assertFalse() : to verify a condition

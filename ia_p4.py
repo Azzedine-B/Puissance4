@@ -1,6 +1,6 @@
-import sys
 import math
 import puissance4 as p4
+import random
 
 def player(state):
 	"Definie quel joueur doit jouer dans l'etat (s)"
@@ -33,48 +33,32 @@ def terminal_test(state):
 		return True
 	return False
 
-"""
-On remplace terminal_test par cutoff_test
-"""
 def cutoff_test(initial_state, state, depth):
-	if(terminal_test(state)):
-		return True
+	"Test de terminaison intermediaire. Vrai si l'etat de jeu correspond a la profondeur souhaitee"
 	if(p4.number_of_pawns(state) - p4.number_of_pawns(initial_state) == depth):
 		return True
 	return False
 
-
 def utility(state, num_player):
 	"Fonction d'utilité : associe une valeur numérique a chaque etat terminal (s) pour un joueur (p)"
 	if(p4.verifVictoire(state) and player(state) != num_player):
-		return 1
+		return math.inf
 	elif(p4.verifVictoire(state) and player(state) == num_player):
-		return -1
+		return - math.inf
 	else:
 		return 0
 
-"""
-Alignement possibles a partir du jeton considere :
-- jeton en 1er position (on progresse positivement)
-- jeton en 2eme position (on progresse du negatif au positif)
-- jeton en 3eme position (identique a 2eme mais en partant du positif vers les negatif)
-- jeton en dernière position (identique a 1ere mais en partant dans les negatifs)
-
-Pour chaque jeton, on calcul une utilite dans les 8 directions cardinal et pour les deux configurations.
-
-
-"""
-
 def alignment_evaluation(state, alignment, num_player):
+	"Evalu un alignement donnee"
 	if 1 in alignment and 2 in alignment:
 		return 0
 	elif((1 in alignment and not 2 in alignment) or (2 in alignment and not 1 in alignment)):
 
 		# continuer a réfléchir sur ce problème
 		if(num_player in alignment and not 0 in alignment):
-			return 10000
+			return math.inf
 		elif(not num_player in alignment and not 0 in alignment):
-			return -10000
+			return -math.inf
 
 		evaluation = 1
 
@@ -84,15 +68,15 @@ def alignment_evaluation(state, alignment, num_player):
 			else:
 				evaluation *= 10
 
-		if(not num_player in alignment):
+		if((2 if num_player == 1 else 1) in alignment):
 			evaluation *= -1
 
 		return evaluation
 	else:
 		return 0
 
-
 def evaluation(state, num_player):
+	"Permet d’évaluer un jeu à un état donné, pour un joueur donné. "
 	liste = p4.verifVictoireColonne(state) + p4.verifVictoireLigne(state) + p4.verifVictoireDiago(state) 
 	evaluation = 0
 	for l in liste:
@@ -101,30 +85,6 @@ def evaluation(state, num_player):
 	return evaluation
 
 
-
-"""
-On remplace utility(state, num_player) par evaluation(state, num_player)
-
-Principe :
-----------
-On parcours tout le plateau
-Seul les alignements ou il encore possible d'obtenir un alignement de 4 pions ou les alignements de 4 pions sont consideres.
-Leurs resultats peuvent etre positif (en faveur du joueur qui calcul l'utilite) , negatif (en sa defaveur) ou nul si un alignement est posible mais qu'aucun pion n'es inséré
-On calcul l'utilite de chaque pion dans toutes les directions cardinales possibles : Nord, Sud, Est, Ouest, Nord-Est, Nord-Ouest, Sud-Est, Sud-Ouest
-L'utilite d'un pion est la somme de ses utilites dans les directions citees precedement
-L'utilite total du plateau est la somme de toutes les utilites de chaque pions 
-
-Calcul :
---------
-On commence avec une utilite de :
-- 1 si le pion considere est celui du joueur
-- -1 si le pion est celui du joueur adverse
-
-On parcours le plateau dans les toutes les directions, en prenant une direction a chaque fois :
-- si dans la case adjacente il y a un pion appartenant au joueur on multiplie par 10
-- si la case adjacente est vide on multiplie par 5
-- si dans la case adjacente il y a un pion appartenant au joueur adverse on multiplie par 0
-"""
 def successors(state):
 	"Retourne l'ensemble des actions et des etats qu'elles generent a partir d'un etat (s)"
 	actions_state = {}
@@ -133,37 +93,54 @@ def successors(state):
 	return actions_state
 
 
-def minimax_descision(state, depth): # cutoff_test and evaluation
-	"Retourne l'action qui maximise l'utilite"
+def alpha_beta_decision(state, depth):
+	# choisir aleatoirement un des resultats max
 	results = {}
 	for a in action(state):
-		results[a] = min_value(state, result(state, a), depth)
+		results[a] = min_value(state, result(state, a), -math.inf, math.inf, depth)
 	print(results)
-	max_key = max(results, key= results.get)
-	return max_key
+	max_val = max(results.values())
+	# choisi aleatoirement une valeur maximum s'il y en a plusieurs
+	return random.choice([k for (k,v) in results.items() if v == max_val])
 
-def min_value(initial_state, state, depth): # cutoff_test and evaluation
-	"Minimise l'utilite adverse"
-	if cutoff_test(initial_state, state, depth):
-		return evaluation(state, 1 if player(state) == 2 else 2) 
-	v = math.inf
-	for a, s in successors(state).items(): # a : action, s : state
-		v = min(v, max_value(initial_state ,s, depth))
-	return v
+def max_value(initial_state, state, alpha, beta, depth):
+	"alpha : meilleure valeur (la plus grande) pour MAX trouve jusqu'a present en dehors du chemin actuel"
+	"beta : meilleur valeur (la plus petite) pour MIN jusqu’a present"
 
-def max_value(initial_state, state, depth): # cutoff_test and evaluation
-	"Maximise l'utilite"
+	if terminal_test(state):
+		return utility(state, player(initial_state))
+
 	if cutoff_test(initial_state, state, depth):
-		return evaluation(state, player(state))
+		return evaluation(state, player(initial_state))
+
 	v = - math.inf
 	for a, s in successors(state).items(): # a : action, s : state
-		v = max(v, min_value(initial_state, s, depth))
+		v = max(v, min_value(initial_state, result(state, a), alpha, beta, depth))
+		if(v >= beta): # Si V est pire que beta, MIN va l’eviter --> elaguer la branche
+			return v
+		alpha = max(alpha, v)
+	return v
+
+def min_value(initial_state, state, alpha, beta, depth):
+	"alpha : meilleure valeur (la plus grande) pour MAX trouve jusqu'a present en dehors du chemin actuel"
+	"beta : meilleur valeur (la plus petite) pour MIN jusqu’a present"
+	if terminal_test(state):
+		return utility(state, player(initial_state))
+
+	if cutoff_test(initial_state, state, depth):
+		return evaluation(state, player(initial_state))
+
+	v = math.inf
+	for a, s in successors(state).items(): # a : action, s : state
+		v = min(v, max_value(initial_state, s, alpha, beta, depth))
+		if(v <= alpha): # Si V est pire que alpha, MAX va l’eviter --> elaguer la branche
+			return v
+		beta = min(beta, v)
 	return v
 
 
 
 #Main permettant de lancer le jeu
-
 def main() :
 	tab= p4.initTableau()
 	choice = 0
@@ -215,6 +192,13 @@ def main() :
 			except ValueError:
 				print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
 
+		if(difficulty == 1):
+			depth = 2
+		elif(difficulty == 2):
+			depth = 3
+		else:
+			depth = 5
+
 		p4.afficheTableau(tab, token_player1, token_player2)
 		while True:
 			if p4.verifVictoire(tab)==True :
@@ -223,14 +207,23 @@ def main() :
 			elif p4.fulled_board(tab) and not p4.verifVictoire(tab):
 				print("Match nul")
 				break
-			else :
+			else:
 				print("Au tour des " + (token_player1 if player(tab)  == 1 else token_player2))
 				if(player(tab) == human_turn):
-					print("Entrez la colonne souhaite :")
-					column = int(input())
-					p4.placerJeton(player(tab), tab, column)
+					column = 0
+					while(column <= 0 or column > 7):
+						print("Entrez la colonne souhaite :")
+						try:
+							column = int(input())
+							if(column < 0 and column > 7):
+								print("Oops!  Votre choix semble incorrect.  Veuillez essayer a nouveau...")
+							else:
+								p4.placerJeton(player(tab), tab, column)
+							break
+						except ValueError:
+							print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
 				else:
-					action = minimax_descision(tab, 1)
+					action = alpha_beta_decision(tab, depth)
 					p4.placerJeton(action[0], tab, action[1])
 			p4.afficheTableau(tab, token_player1, token_player2)
 
@@ -250,8 +243,18 @@ Deux posibilitées pour l'heuristique :
 
 Considéré un jeton :
 -------------------
-- 
+- on calcul le taux de cernement d'un pion
+Ex : 
 
+ O   O   O 
+---|---|----
+ X | O | X
+---|---|----
+ O   O   O
+ """
+
+
+"""
 désavantages :
 -------------
 - Long : on traite chaque pion (donc on parcours tout le plateau), puis son voisinage :
@@ -313,31 +316,137 @@ p4.placerJeton(1, board, 6)
 
 
 """
-def max_value(state, alpha, beta): # alpha-beta
-	if(terminal_test(state)):
-		return utility(state, 2)
 
-	v = -1000
+def minimax_descision(state, depth): # cutoff_test and evaluation
+	"Retourne l'action qui maximise l'utilite"
+	results = {}
+	for a in action(state):
+		results[a] = min_value(state, result(state, a), depth)
+	print(results)
+	max_key = max(results, key= results.get)
+	return max_key
+
+def min_value(initial_state, state, depth): # cutoff_test and evaluation
+	"Minimise l'utilite adverse"
+	if cutoff_test(initial_state, state, depth):
+		# return token_evaluation(state, 1 if player(state) == 2 else 2)
+		return evaluation(state, 1 if player(state) == 2 else 2) 
+	v = math.inf
 	for a, s in successors(state).items(): # a : action, s : state
-		print(alpha, beta)
-		v = max(v, min_value(state, alpha, beta))
-		if(v >= beta):
-			return v
-		alpha = max(alpha, v)
+		v = min(v, max_value(initial_state ,s, depth))
+	return v
 
+def max_value(initial_state, state, depth): # cutoff_test and evaluation
+	"Maximise l'utilite"
+	if cutoff_test(initial_state, state, depth):
+		#return token_evaluation(state, player(state))
+		return evaluation(state, player(state))
+	v = - math.inf
+	for a, s in successors(state).items(): # a : action, s : state
+		v = max(v, min_value(initial_state, s, depth))
 	return v
 
 
-def min_value(state, alpha, beta): # alhpa-beta
-	if(terminal_test(state)):
-		return utility(state, 2)
 
-	v = 1000
-	for a, s in successors(state).items(): # a : action, s : state
-		print(alpha, beta)
-		v = min(v, max_value(state, alpha, beta))
-		if(v <= alpha):
-			return v
-		beta = min(beta, v)
-	return v
+def alpha_beta_decision(state, depth):
+	results = {}
+	for a in action(state):
+		# print("*************** Tour, Alpha:", alpha , "Beta:", beta)
+		results[a] = minimax(state, result(state, a), depth, False, -math.inf, math.inf)
+	print(results)
+	max_key = max(results, key= results.get)
+	return max_key
+
+
+def minimax(initial_state, state, depth, is_maximizing_player, alpha, beta):
+	if terminal_test(state):
+		return utility(state, player(initial_state))
+
+	if cutoff_test(initial_state, state, depth):
+		return evaluation(state, player(initial_state))
+    
+	if is_maximizing_player:
+		best_val = (-math.inf) 
+		for a, s in successors(state).items(): # a : action, s : state
+			value = minimax(initial_state, s, depth, False, alpha, beta)
+			best_val = max(best_val, value) 
+			alpha = max(alpha, best_val)
+			# print("Alpha:",best_val)
+			if beta <= alpha:
+				break
+		return best_val
+
+	else :
+		best_val = math.inf
+		for a, s in successors(state).items(): # a : action, s : state
+			value = minimax(initial_state, s, depth, True, alpha, beta)
+			best_val = min(best_val, value) 
+			beta = min(beta, best_val)
+			# print("Beta:", beta)
+			if beta <= alpha:
+				break
+		return best_val
+
+def token_evaluation(state, num_player):
+	evaluation = 0
+	for i in range(state.shape[0]):
+		for j in range(state.shape[1]):
+	 		token_evaluation = 1 if state[i,j] == num_player else -1
+	 		for i2 in range(i-1, i+1):
+	 			if(i2 < 0 or i2 >= state.shape[0]):
+	 				continue
+	 			for j2 in range(j-1, j+1):
+	 				if(j2 < 0 or j2 >= state.shape[1] or (i2 == i and j2== j)):
+	 					continue
+	 				if(state[i2,j2] == num_player):
+	 					token_evaluation *= 100
+	 				elif(state[i2,j2] != num_player):
+	 					token_evaluation -= 1000
+	 				else:
+	 					token_evaluation += 0
+	 		evaluation += token_evaluation
+
+	return token_evaluation
+
+
+def alignment_evaluation2(state, alignment, num_player):
+	if 1 in alignment and 2 in alignment:
+		return 0
+	elif((1 in alignment and not 2 in alignment) or (2 in alignment and not 1 in alignment)):
+
+		# continuer a réfléchir sur ce problème
+		if(num_player in alignment and not 0 in alignment):
+			return math.inf
+		elif(not num_player in alignment and not 0 in alignment):
+			return -math.inf
+		elif(not num_player in alignment):
+			cpt = 0
+			for token in alignment: 
+				if(token != 0):
+					cpt += 1
+			if(cpt > 2):
+				return - 100000
+			else:
+				return -1000
+		elif(num_player in alignment):
+			cpt = 0
+			for token in alignment:
+				if(token != 0):
+					cpt += 1
+			if(cpt == 2):
+				return 100000
+			elif(cpt == 3):
+				return 1000000
+			else:
+				return 10000
+	else:
+		return 0
+
+Le but du puissance 4 :
+- bloquer le joueur pour l'empecher de gagner
+- aligner le plus de pion possible
+
+Lorsque l'ennemi a moins de 3 pions aligne, opter pour l'option aligner le plus de pion possible
+Lorsque l'ennemi a 3 pions aligner le bloquer 
+
 """
