@@ -72,7 +72,12 @@ def token_distribution(choice):
 
 def determine_depth(difficulty):
 	"""chooses the depth according to the difficulty"""
-	return 3 if difficulty == 2 else 5
+	if(difficulty == 1):
+		return 2
+	elif(difficulty == 2):
+		return 4
+	else:
+		return 5
 
 def player_turn():
 	column = 0
@@ -86,4 +91,3 @@ def player_turn():
 				return column
 		except ValueError:
 			print("Oops!  Saisie incorrect.  Veuillez essayer a nouveau...")
-

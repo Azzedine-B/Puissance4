@@ -45,36 +45,37 @@ def utility(state, num_player):
 	if(p4.verifVictoire(state) and player(state) != num_player):
 		return math.inf
 	elif(p4.verifVictoire(state) and player(state) == num_player):
-		return - math.inf
+		return -math.inf
 	else:
 		return 0
 
-def alignment_evaluation(state, alignment, num_player):
-	"Evalu un alignement donnee"
+# evulation calculant l'alignement maximum 
+# conserve mais pas utilise dans ce programme
+def maximum_alignement_evaluation(state, num_player):
+	"allows to evaluate a given game state with the maximum_alignment function"
+	liste = p4.verifVictoireColonne(state) + p4.verifVictoireLigne(state) + p4.verifVictoireDiago(state) 
+	maximum_rating = 0
+
+	for l in liste:
+		evaluation = alignement_evaluation(state, l, num_player)
+		if(evaluation > maximum_rating):
+			maximum_rating = evaluation
+	return maximum_rating
+
+def maximum_alignement(state, alignment, num_player):
+	"calculates the maximum token alignment"
+	num_opponent = 1 if num_player == 2 else 2
+
 	if 1 in alignment and 2 in alignment:
 		return 0
-	elif((1 in alignment and not 2 in alignment) or (2 in alignment and not 1 in alignment)):
 
-		# continuer a réfléchir sur ce problème
-		if(num_player in alignment and not 0 in alignment):
-			return math.inf
-		elif(not num_player in alignment and not 0 in alignment):
-			return -math.inf
+	evaluation = 0
+	for space in alignment:
+		if(space == num_player):
+			evaluation += 1
 
-		evaluation = 1
+	return evaluation
 
-		for i in range(4):
-			if(alignment[i] == 0):
-				evaluation *= 1
-			else:
-				evaluation *= 10
-
-		if((2 if num_player == 1 else 1) in alignment):
-			evaluation *= -1
-
-		return evaluation
-	else:
-		return 0
 
 def evaluation(state, num_player):
 	"Permet d’évaluer un jeu à un état donné, pour un joueur donné. "
@@ -82,6 +83,31 @@ def evaluation(state, num_player):
 	evaluation = 0
 	for l in liste:
 		evaluation += alignment_evaluation(state, l, num_player)
+
+	return evaluation
+
+
+def alignment_evaluation(state, alignment, num_player):
+	num_opponent = 1 if num_player == 2 else 2
+
+	if not 1 in alignment and not 2 in alignment:
+		return 0
+
+	if 1 in alignment and 2 in alignment:
+		return 0
+
+	if num_player in alignment and not 0 in alignment and not num_opponent in alignment:
+		return math.inf
+
+	if num_opponent in alignment and not 0 in alignment and not num_player in alignment:
+		return -math.inf
+
+	evaluation = 1
+	for space in alignment:
+		if(space == num_player):
+			evaluation *= 10
+		else:
+			evaluation *= -10
 
 	return evaluation
 
@@ -100,7 +126,11 @@ def alpha_beta_decision(state, depth):
 		results[a] = min_value(state, result(state, a), -math.inf, math.inf, depth)
 	print(results)
 	max_val = max(results.values())
-	# choisi aleatoirement une valeur maximum s'il y en a plusieurs
+	# Si plusieurs coups renvoient la même évaluation :
+	for k, v in results.items(): # choisi un coup gagnant s'il en existe un
+		if(terminal_test(result(state, k))):
+			return k
+	# sinon choisi aléatoirement parmi un coup
 	return random.choice([k for (k,v) in results.items() if v == max_val])
 
 def max_value(initial_state, state, alpha, beta, depth):
@@ -164,10 +194,7 @@ def game():
 				column = interface.player_turn()
 				p4.placerJeton(player(tab), tab, column)
 			else:
-				if(difficulty != 1):
-					action = alpha_beta_decision(tab, depth)
-				else:
-					action = (player(tab), random.randint(1, 7))
+				action = alpha_beta_decision(tab, depth)
 				p4.placerJeton(action[0], tab, action[1])
 		p4.afficheTableau(tab, token_player1, token_player2)
 
